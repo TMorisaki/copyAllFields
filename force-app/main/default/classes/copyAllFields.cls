@@ -10,7 +10,7 @@ public without sharing virtual class copyAllFields {
     public virtual Map<String, String> standardMapping(){
         Map<String, String> standardFieldMap = new Map<String, String>();
         //Map<sourceFieldName, targetFieldName>
-        standardFieldMap.put('Name','Name');
+        standardFieldMap.put('name','name');
         //Other standard fields similarly.
         return standardFieldMap;
     }    
@@ -41,7 +41,6 @@ public without sharing virtual class copyAllFields {
                 }else{
                     system.debug('There is not a field;' + field);
                 }
-                //mention other standard fields similarly, system fields such as Id, createdDate etc can not be copied. 
             }
             co2.add(clone);
         }
