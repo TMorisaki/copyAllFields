@@ -3,7 +3,11 @@ public without sharing virtual class copyAllFields {
     //call this method in Apex Trigger
     public void runCopy(List<SObject> sourceList, String targetObjectString) {
         List<SObject> targets = transferSObjectFieldValues(sourceList, targetObjectString);
-        insert targets;
+        try {
+            insert targets;
+        } catch (DmlException e) {
+            System.debug('The following exception has occurred: ' + e.getMessage());
+        }
     }
     
     //override this method in extends Apex Class
@@ -17,7 +21,7 @@ public without sharing virtual class copyAllFields {
 
     //Logic
     public List<SObject> transferSObjectFieldValues(List<SObject> sourceList, String targetObjectString){
-        Set<String> fields = sourceList.getSobjectType().getDescribe().fields.getMap().keySet();
+        Set<String> sourceFields = sourceList.getSobjectType().getDescribe().fields.getMap().keySet();
 
         SObject targetObject = Schema.getGlobalDescribe().get(targetObjectString).newSObject();
         SObjectType targetType = ((SObject) Type.forName(targetObjectString).newInstance()).getSObjectType();
@@ -29,17 +33,22 @@ public without sharing virtual class copyAllFields {
         List<SObject> co2 = new List<SObject>();
         for(SObject record: sourceList) {
             SObject clone = targetType.newSObject();
-            for(String field:fields) {
+            for(String field:sourceFields) {
                 //This will only copy custom fields of sourceObject and assumes that field api name is similar in targetobject
                 if(field.indexOf('__c')>-1){
                     if (targetfields.containsKey(field)){
                         clone.put(field, record.get(field));
                     }
-                }else if(standardMap.containsKey(field)){
-                    system.debug('There is a field;' + field);
-                    clone.put(standardMap.get(field), record.get(field));
+                }else if(standardMap.containsKey(field) && targetfields.containsKey(field)){
+                    try {
+                        system.debug('Field exists;' + field);
+                        clone.put(standardMap.get(field), record.get(field));
+                    } catch (SObjectException e) {
+                        System.debug('The following exception has occurred: ' + e.getMessage());
+                    }
+                    
                 }else{
-                    system.debug('There is not a field;' + field);
+                    system.debug('Field does not exist;' + field);
                 }
             }
             co2.add(clone);
