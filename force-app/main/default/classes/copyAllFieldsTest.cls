@@ -18,14 +18,17 @@ public without sharing class copyAllFieldsTest {
     @isTest
     static void testExtendedSettings(){
         List<Account> accts = new List<Account>{
-            new Account(Name = NAME_TEST, billingCity = CITY_NY )
+            new Account(Name = NAME_TEST + '1', billingCity = CITY_NY ),
+            new Account(Name = NAME_TEST + '2' )
         };
         testCopy cp = new testCopy();
         insert accts;
         Test.startTest();
         cp.runCopy(accts, 'Contact');
         System.assertEquals('New York',cp.transferSObjectFieldValues(accts,'Contact')[0].get('MailingCity'));
-        System.assertEquals('Test',cp.transferSObjectFieldValues(accts,'Contact')[0].get('LastName'));
+        System.assertEquals('Test1',cp.transferSObjectFieldValues(accts,'Contact')[0].get('LastName'));
+        System.assertEquals( null ,cp.transferSObjectFieldValues(accts,'Contact')[1].get('MailingCity'));
+        System.assertEquals('Test2',cp.transferSObjectFieldValues(accts,'Contact')[1].get('LastName'));
         Test.stopTest();
     }
 

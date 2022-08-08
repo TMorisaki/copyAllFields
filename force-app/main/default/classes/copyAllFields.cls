@@ -21,37 +21,37 @@ public without sharing virtual class copyAllFields {
 
     //Logic
     public List<SObject> transferSObjectFieldValues(List<SObject> sourceList, String targetObjectString){
-        Set<String> sourceFields = sourceList.getSobjectType().getDescribe().fields.getMap().keySet();
+        Schema.DescribeSObjectResult sourceDsr = sourceList.getSobjectType().getDescribe();
+        Map<String, Schema.SObjectField> sourceFields = sourceDsr.fields.getMap();
 
-        SObject targetObject = Schema.getGlobalDescribe().get(targetObjectString).newSObject();
-        SObjectType targetType = ((SObject) Type.forName(targetObjectString).newInstance()).getSObjectType();
-        Map<String, Schema.SObjectField> targetfields = targetObject.getsObjectType().getDescribe().fields.getMap();
+        Map<String, Schema.SObjectField> targetfields = Schema.getGlobalDescribe().get(targetObjectString)
+                                                        .newSObject().getSObjectType().getDescribe().fields.getMap();
 
         Map<String, String> standardMap = new Map<String, String>(standardMapping());
         System.debug(standardMap);
         
         List<SObject> co2 = new List<SObject>();
         for(SObject record: sourceList) {
-            SObject clone = targetType.newSObject();
-            for(String field:sourceFields) {
-                //This will only copy custom fields of sourceObject and assumes that field api name is similar in targetobject
-                if(field.indexOf('__c')>-1){
-                    if (targetfields.containsKey(field)){
-                        clone.put(field, record.get(field));
+            SObject targetObject = Schema.getGlobalDescribe().get(targetObjectString).newSObject();
+            targetObject.clear();
+            for(String sourceField:sourceFields.keySet()) {
+                if(sourceFields.get(sourceField).getDescribe().isCustom()){
+                    if (targetfields.containsKey(sourceField)){
+                        targetObject.put(sourceField, record.get(sourceField));
                     }
-                }else if(standardMap.containsKey(field) && targetfields.containsKey(field)){
+                }else if(standardMap.containsKey(sourceField) && targetfields.containsKey(standardMap.get(sourceField))){
                     try {
-                        system.debug('Field exists;' + field);
-                        clone.put(standardMap.get(field), record.get(field));
+                        system.debug('Field exists;' + sourceField);
+                        targetObject.put(standardMap.get(sourceField), record.get(sourceField));
                     } catch (SObjectException e) {
                         System.debug('The following exception has occurred: ' + e.getMessage());
                     }
                     
                 }else{
-                    system.debug('Field does not exist;' + field);
+                    system.debug('Field does not exist;' + sourceField);
                 }
             }
-            co2.add(clone);
+            co2.add(targetObject);
         }
         System.debug(co2);
         return co2;
