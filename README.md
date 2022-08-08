@@ -1,23 +1,23 @@
 # About CopyAllFields
 
-SourceObjectとTargetObject間で、次の項目をマッピングし、コピーする機能を持っています。
--API参照名が一致するカスタム項目
--マッピングされたSourceObjectの標準項目とTargetObjectの項目
+SourceObjectとTargetObject間で、次の項目をマッピングし、コピーする機能を持っています。  
+- API参照名が一致するカスタム項目
+- マッピングされたSourceObjectの標準項目とTargetObjectの項目
 
-It has the function to map and copy the following items between SourceObject and TargetObject.
--Custom fields with matching API name
--Mapped standard fields in source object and fields in target object.
+It has the function to map and copy the following items between SourceObject and TargetObject.  
+- Custom fields with matching API name
+- Mapped standard fields in source object and fields in target object.
 
 ## How to user?
 
 ### Step1. Mapping Standard fields
-copyAllFieldsを拡張します。新しくApex Classを作成し、例えば以下のようにします。
-注意
--MapはキーがSource、値がTargetとなりますのでご注意ください。
--項目名は小文字で入力してください
+copyAllFieldsを拡張します。新しくApex Classを作成し、例えば以下のようにします。  
+注意  
+- MapはキーがSource、値がTargetとなりますのでご注意ください。
+- 項目名は小文字で入力してください
 
-Extends copyAllFields. Create a new Apex Class like following:
-note) the Map key is the Source and the value is the Target.
+Extends copyAllFields. Create a new Apex Class like following:  
+note) the Map key is the Source and the value is the Target.  
 
 ```java
 public without sharing class copyAccountAllFields extends copyAllFields {
